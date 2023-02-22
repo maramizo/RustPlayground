@@ -1,5 +1,4 @@
 use rayon::prelude::*;
-use rand::Rng;
 
 fn merge_sort(arr: &mut [i32]) {
     if arr.len() <= 1 {
@@ -39,17 +38,34 @@ fn merge(arr: &mut [i32], mid: usize) {
     }
 }
 
-
-pub fn serial_mergesort_test(array_size: usize) {
-    let mut arr: Vec<i32> = (0..array_size).map(|_| rand::random::<i32>()).collect();
+/// Serial mergesort
+///
+/// # Test
+///
+/// ```
+/// use rust_playground::merge_sort::serial_mergesort;
+/// assert_eq!(serial_mergesort(&vec![-3, 315908580, -31490314, 321, 0]), vec![-31490314, -3, 0, 321, 315908580]);
+/// ```
+pub fn serial_mergesort(arr: &Vec<i32>) -> Vec<i32> {
+    let mut arr = arr.clone();
     let now = std::time::Instant::now();
     merge_sort(&mut arr);
     println!("Serial mergesort time: {}ms", now.elapsed().as_millis());
+    arr
 }
 
-pub fn parallel_mergesort_test(array_size: usize) {
-    let mut chunk_size: usize = array_size / std::thread::available_parallelism().unwrap();
-    let mut arr: Vec<i32> = (0..array_size).map(|_| rand::thread_rng().gen::<i32>()).collect();
+/// Parallel mergesort
+///
+/// # Test
+///
+/// ```
+/// use rust_playground::merge_sort::parallel_mergesort;
+/// assert_eq!(parallel_mergesort(&vec![-3, 315908580, -31490314, 321, 0]), vec![-31490314, -3, 0, 321, 315908580]);
+/// ```
+pub fn parallel_mergesort(arr: &Vec<i32>) -> Vec<i32> {
+    let mut arr = arr.clone();
+    let array_size: usize = arr.len();
+    let mut chunk_size: usize = std::cmp::max(array_size / std::thread::available_parallelism().unwrap(), 1);
     let now = std::time::Instant::now();
     arr.par_chunks_mut(chunk_size)
         .for_each(|chunk| merge_sort(chunk));
@@ -65,4 +81,5 @@ pub fn parallel_mergesort_test(array_size: usize) {
         chunk_size *= 2;
     }
     println!("Parallel mergesort time: {}ms", now.elapsed().as_millis());
+    arr
 }
