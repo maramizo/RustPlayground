@@ -1,7 +1,6 @@
 mod merge_sort;
 mod pdqsort;
-const ARRAY_SIZE: usize = 1300000;
-
+const ARRAY_SIZE: usize = 2_000_000;
 
 fn main(){
     merge_sort::serial_mergesort_test(ARRAY_SIZE);
